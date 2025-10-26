@@ -2,16 +2,13 @@ package com.lyndas.lechon.controller;
 
 import com.lyndas.lechon.model.MenuItem;
 import com.lyndas.lechon.model.OrderItem;
+import com.lyndas.lechon.model.UpdateAvailabilityRequest;
+import com.lyndas.lechon.model.UpdateOrderStatusRequest;
 import com.lyndas.lechon.repository.MenuItemRepository;
 import com.lyndas.lechon.repository.OrderItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -26,67 +23,60 @@ public class MainController {
     }
 
     @RequestMapping("/")
-    public String greet(){
+    public String greet() {
         return "Welcome Milord!";
     }
 
     @RequestMapping("/about")
-    public String about(){
+    public String about() {
         return "ABOUT METHOD";
     }
 
     @RequestMapping("/products")
-    public List<MenuItem> listProducts(){
-        List<MenuItem> menuItems = Arrays.asList(
-                MenuItem.builder()
-                        .id(12345)
-                        .name("Lechon Belly")
-                        .description("Succulent roasted pork belly with crispy skin.")
-                        .price(new BigDecimal("1200.00"))
-                        .category("Main Dish")
-                        .imageUrl("images/lechon_belly.jpg")
-                        .availability(true)
-                        .build(),
-
-                MenuItem.builder()
-                        .id(6789)
-                        .name("Pancit Canton")
-                        .description("Stir-fried egg noodles with vegetables, pork, and shrimp.")
-                        .price(new BigDecimal("250.00"))
-                        .category("Noodles")
-                        .imageUrl("images/pancit_canton.jpg")
-                        .availability(true)
-                        .build(),
-
-                MenuItem.builder()
-                        .id(101112)
-                        .name("Halo-Halo")
-                        .description("Traditional Filipino dessert with shaved ice, milk, and mixed sweets.")
-                        .price(new BigDecimal("120.00"))
-                        .category("Dessert")
-                        .imageUrl("images/halo_halo.jpg")
-                        .availability(true)
-                        .build(),
-
-                MenuItem.builder()
-                        .id(131415)
-                        .name("Iced Calamansi Juice")
-                        .description("Refreshing citrus drink made from calamansi.")
-                        .price(new BigDecimal("60.00"))
-                        .category("Drinks")
-                        .imageUrl("images/calamansi_juice.jpg")
-                        .availability(true)
-                        .build()
-        );
-
-        return menuItems;
-
+    public List<MenuItem> listProducts() {
+        return menuItemRepository.findAll();
     }
+
+    @PostMapping("/add-product")
+    public MenuItem addMenuItem(@RequestBody MenuItem menuItem) {
+        return menuItemRepository.save(menuItem);
+    }
+
+    @PatchMapping("/menu/update-availability")
+    public ResponseEntity<MenuItem> updateAvailability(@RequestBody UpdateAvailabilityRequest request) {
+        MenuItem existing = menuItemRepository.findByItemId(request.getItemId());
+
+        if (existing != null) {
+            existing.setAvailable(request.isAvailable());
+            menuItemRepository.save(existing);
+            return ResponseEntity.ok(existing);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 
     @PostMapping("/order")
     public OrderItem placeOrder(@RequestBody OrderItem orderItem) {
         return orderItemRepository.save(orderItem);
     }
 
+    @GetMapping("/list-orders")
+    public List<OrderItem> getAllOrders() {
+        return orderItemRepository.findAll();
+    }
 
+    @GetMapping("/orders/customer/{customerId}")
+    public List<OrderItem> getOrdersByCustomerId(@PathVariable String customerId) {
+        return orderItemRepository.findByCustomerId(customerId);
+    }
+
+    @PatchMapping("/orders/status-update")
+    public ResponseEntity<OrderItem> updateOrderStatus(
+            @RequestBody UpdateOrderStatusRequest statusRequest) {
+
+        return orderItemRepository.findByOrderId(statusRequest.getOrderId()).map(order -> {
+            orderItemRepository.save(order);
+            return ResponseEntity.ok(order);
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

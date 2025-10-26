@@ -1,47 +1,33 @@
 package com.lyndas.lechon.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
-@Table(name = "menu_items")
-@Data                   // generates getters, setters, toString, equals, hashCode
-@NoArgsConstructor      // generates no-args constructor
-@AllArgsConstructor     // generates all-args constructor
-@Builder                // allows builder pattern
+@Table(name = "menu_item")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@IdClass(MenuItemId.class)
 public class MenuItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "item_id", nullable = false, length = 50)
+    private String itemId;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+    @Id
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Size size;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "item_name", nullable = false, length = 100)
+    private String itemName;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(name = "is_available", nullable = false)
+    private boolean isAvailable = true;
 
-    @Column(length = 50)
-    private String category;
-
-    @Column(length = 255)
-    private String imageUrl;
-
-    private Boolean availability = true;
-
-    @Column(updatable = false, insertable = false)
-    private LocalDateTime createdAt;
-
-    @Column(insertable = false, updatable = false)
-    private LocalDateTime updatedAt;
+    public enum Size {
+        Small, Medium, Large
+    }
 }

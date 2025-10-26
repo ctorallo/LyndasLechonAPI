@@ -1,13 +1,10 @@
 package com.lyndas.lechon.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -18,36 +15,47 @@ import java.time.LocalDateTime;
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "order_id", nullable = false, length = 50)
+    private String orderId = UUID.randomUUID().toString();
 
-    // FK to users
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "employee_id", length = 50)
+    private String employeeId;
 
-    private String branch;
+    @Column(name = "customer_id", nullable = false, length = 50)
+    private String customerId;
 
-    @Column(name = "reservation_date")
-    private LocalDate reservationDate;
+    @Column(name = "customer_name", nullable = false, length = 100)
+    private String customerName;
 
-    @Column(name = "time_slot")
-    private String timeSlot;
+    @Column(name = "claim_date", nullable = false)
+    private LocalDateTime claimDate;
 
-    @Column(name = "number_of_guests")
-    private Integer numberOfGuests;
+    @Column(name = "item_id", nullable = false, length = 50)
+    private String itemId;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('pending','confirmed','cancelled','completed') DEFAULT 'pending'")
+    @Column(nullable = false)
+    private MenuItem.Size size;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "claim_type", nullable = false)
+    private ClaimType claimType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type", nullable = false)
+    private PaymentType paymentType;
+
+    @Column(name = "item_quantity", nullable = false)
+    private int itemQuantity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status = Status.pending;
 
-    @Column(name = "created_at", updatable = false, insertable = false)
-    private LocalDateTime createdAt;
+    @Convert(converter = ExtrasConverter.class)
+    private Map<String, Integer> extras;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
-    private LocalDateTime updatedAt;
-
-    public enum Status {
-        pending, confirmed, cancelled, completed
-    }
+    public enum ClaimType { delivery, pickup }
+    public enum PaymentType { gcash, cash_on_delivery, bank_transfer }
+    public enum Status { completed, cancelled, pending }
 }
-

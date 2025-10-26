@@ -1,0 +1,25 @@
+CREATE TABLE `orders` (
+  `order_id` varchar(50) NOT NULL,
+  `employee_id` varchar(50) DEFAULT NULL,
+  `customer_id` varchar(50) NOT NULL,
+  `customer_name` varchar(100) NOT NULL,
+  `claim_date` datetime NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `size` enum('Small','Medium','Large') NOT NULL,
+  `claim_type` enum('delivery','pickup') NOT NULL,
+  `payment_type` enum('gcash','cash_on_delivery','bank_transfer') NOT NULL,
+  `item_quantity` int(11) NOT NULL,
+  `status` enum('completed','cancelled','pending') DEFAULT 'pending',
+  `extras` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`order_id`),
+  KEY `item_id` (`item_id`,`size`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`item_id`, `size`) REFERENCES `menu_item` (`item_id`, `size`)
+)
+
+ CREATE TABLE `menu_item` (
+  `item_id` varchar(50) NOT NULL,
+  `item_name` varchar(100) NOT NULL,
+  `size` enum('Small','Medium','Large') NOT NULL,
+  `is_available` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`item_id`,`size`)
+)
