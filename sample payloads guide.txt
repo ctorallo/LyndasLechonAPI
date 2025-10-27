@@ -1,0 +1,38 @@
+http://localhost:8080/auth/register
+{
+  "userId": "U001",
+  "username": "jayson",
+  "email": "jayson@example.com",
+  "password": "secret123",
+  "role": "CUSTOMER"
+}
+
+
+http://localhost:8080/auth/login
+{
+  "username": "jayson",
+  "password": "secret123"
+}
+
+
+http://localhost:8080/order
+{
+  "orderId": "ORD001",
+  "employeeId": "EMP001",
+  "customerId": "CUST001",
+  "customerName": "Juan Dela Cruz",
+  "claimDate": "2025-10-26T14:30:00",
+  "itemId": "3",
+  "size": "Large",
+  "claimType": "delivery",
+  "paymentType": "gcash",
+  "itemQuantity": 2,
+  "status": "pending",
+  "extras": {
+    "utensils": 10,
+    "sauce_pack": 3
+  }
+}
+
+
+
