@@ -7,6 +7,7 @@ import com.lyndas.lechon.model.UpdateOrderStatusRequest;
 import com.lyndas.lechon.repository.MenuItemRepository;
 import com.lyndas.lechon.repository.OrderItemRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class MainController {
     }
 
     @RequestMapping("/about")
+    @PreAuthorize("isAuthenticated()")
     public String about() {
         return "ABOUT METHOD";
     }
@@ -38,11 +40,13 @@ public class MainController {
     }
 
     @PostMapping("/add-product")
+    @PreAuthorize("hasRole('ADMIN')")
     public MenuItem addMenuItem(@RequestBody MenuItem menuItem) {
         return menuItemRepository.save(menuItem);
     }
 
     @PatchMapping("/menu/update-availability")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MenuItem> updateAvailability(@RequestBody UpdateAvailabilityRequest request) {
         MenuItem existing = menuItemRepository.findByItemId(request.getItemId());
 
@@ -56,21 +60,25 @@ public class MainController {
 
 
     @PostMapping("/order")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public OrderItem placeOrder(@RequestBody OrderItem orderItem) {
         return orderItemRepository.save(orderItem);
     }
 
     @GetMapping("/list-orders")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<OrderItem> getAllOrders() {
         return orderItemRepository.findAll();
     }
 
     @GetMapping("/orders/customer/{customerId}")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public List<OrderItem> getOrdersByCustomerId(@PathVariable String customerId) {
         return orderItemRepository.findByCustomerId(customerId);
     }
 
     @PatchMapping("/orders/status-update")
+    @PreAuthorize("hasRole('ADMIN', 'CUSTOMER')")
     public ResponseEntity<OrderItem> updateOrderStatus(
             @RequestBody UpdateOrderStatusRequest statusRequest) {
 
