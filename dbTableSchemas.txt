@@ -23,3 +23,16 @@ CREATE TABLE `orders` (
   `is_available` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`item_id`,`size`)
 )
+
+
+CREATE TABLE `users` (
+  `user_id` varchar(50) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('CUSTOMER','EMPLOYEE','ADMIN') DEFAULT 'CUSTOMER',
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+}
